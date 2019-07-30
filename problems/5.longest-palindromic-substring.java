@@ -4,21 +4,26 @@
  * [5] Longest Palindromic Substring
  */
 class Solution {
-    private int palindromicLen(String s, int center, boolean actual) {
-        int start = center;
-        int end = actual?center:center+1;
-        // System.out.println("palindromicLen: " + start + "-" + end);
-        for (int offset = 0;; offset++) {
-            int localStart = start - offset;
-            int localEnd = end + offset;
-            if (s.charAt(localStart) != s.charAt(localEnd)) {
-                return localEnd - localStart - 1;
-            }
-            if (localStart == 0 || localEnd == s.length() - 1) {
-                return localEnd - localStart + 1;
-            }
+
+    private void updatePalindromic(String s, int left, int right) {
+        // System.out.println(left + "," + right);
+        while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
+            // System.out.println(s.substring(left, right + 1));
+            left--;
+            right++;
+        }
+        left++;
+        right--;
+        // System.out.println(left + "," + right);
+        int len = right - left + 1;
+        if (len > longestLen) {
+            longestLen = len;
+            longestStart = left;
         }
     }
+
+    private int longestStart;
+    private int longestLen;
 
     public String longestPalindrome(String s) {
         if (s == null || s.isEmpty()) {
@@ -27,31 +32,14 @@ class Solution {
         if (s.length() == 1) {
             return s;
         }
-        int longest = 0;
-        int start = 0;
         for (int i = 0; i < s.length() - 1; i++) {
-            int len = palindromicLen(s, i, true);
-            // System.out.println(i + "-" + len);
-            if (len > longest) {
-                longest = len;
-                start = i - (len - 1) / 2;
-                // System.out.println(start+ "-" + longest);
-            }
-            len = palindromicLen(s, i, false);
-            // System.out.println(i+ "-" + len);
-            if (len > longest) {
-                longest = len;
-                start = i - (len / 2 - 1);
-                // System.out.println(start+ "-" + longest);
-            }
+            updatePalindromic(s, i, i);
+            updatePalindromic(s, i, i + 1);
         }
-        if (longest == 0) {
-            longest = 1;
-        }
-        return s.substring(start, start + longest);
+        return s.substring(longestStart, longestStart + longestLen);
     }
 
     public static void main(String[] args) {
-        System.out.println(new Solution().longestPalindrome("cbbd"));
+        System.out.println(new Solution().longestPalindrome("ac"));
     }
 }
